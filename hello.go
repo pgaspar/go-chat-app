@@ -26,6 +26,7 @@ package main
 import "net/http"
 import "html/template"
 import "github.com/gorilla/mux"
+import "encoding/json"
 
 var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
 
@@ -56,9 +57,24 @@ func handler(w http.ResponseWriter, r *http.Request) {
   templates.ExecuteTemplate(w, "index", &data)
 }
 
+func getUsersHandler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type", "application/json")
+
+  // Marshal goes through the whole struct tree and never includes
+  // private variables
+  j, _ := json.Marshal(users)
+
+  w.Write(j)
+}
+
+func newUsersHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func main() {
   r := mux.NewRouter()
   r.HandleFunc("/", handler)
-  r.HandleFunc("/users", handler).Methods("GET")
+  r.HandleFunc("/users", getUsersHandler).Methods("GET")
+  r.HandleFunc("/users/new", newUsersHandler).Methods("GET")
   http.ListenAndServe(":8080", r)
 }
