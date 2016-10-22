@@ -68,13 +68,18 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func newUsersHandler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type", "application/json")
 
+  username := mux.Vars(r)["username"]
+  users = append(users, User {
+    Username: username,
+  })
 }
 
 func main() {
   r := mux.NewRouter()
   r.HandleFunc("/", handler)
   r.HandleFunc("/users", getUsersHandler).Methods("GET")
-  r.HandleFunc("/users/new", newUsersHandler).Methods("GET")
+  r.HandleFunc("/users/new/{username:[a-zA-Z]+}", newUsersHandler).Methods("GET")
   http.ListenAndServe(":8080", r)
 }
