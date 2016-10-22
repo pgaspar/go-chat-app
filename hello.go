@@ -25,6 +25,7 @@ package main
 
 import "net/http"
 import "html/template"
+import "github.com/gorilla/mux"
 
 var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
 
@@ -48,6 +49,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-  http.HandleFunc("/", handler)
-  http.ListenAndServe(":8080", nil)
+  r := mux.NewRouter()
+  r.HandleFunc("/", handler)
+  r.HandleFunc("/users", handler).Methods("GET")
+  http.ListenAndServe(":8080", r)
 }
