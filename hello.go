@@ -21,6 +21,9 @@
 // gorillatoolkit.org - series of packages you can use to build web apps
 // gorilla/mux -> routing (go get github.com/gorilla/mux)
 
+// Default DB conectors will most likely work with pure SQL
+// There are some ORMs available, like github.com/jinzhu/gorm
+
 package main
 
 import "net/http"
