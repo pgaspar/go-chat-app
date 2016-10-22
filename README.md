@@ -2,7 +2,7 @@
 
 Example chat app using websockets. Code and notes from a Go workshop by [@adbjesus](http://github.com/adbjesus).
 
-## Topics covered
+## Covered Topics
 
 Some of the topics discussed in the workshop (or that I investigated myself at the time):
 
