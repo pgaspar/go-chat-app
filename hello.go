@@ -1,4 +1,4 @@
-// Go is procedural. There are no classes, only structs
+// Go is procedural. There are no classes, only structs (aka Interfaces)
 
 // Install fresh (go get github.com/pilu/fresh), cd to work dir & run `fresh`
 
@@ -27,6 +27,7 @@ import "net/http"
 import "html/template"
 import "github.com/gorilla/mux"
 import "encoding/json"
+import "github.com/gorilla/websocket"
 
 var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
 
@@ -78,7 +79,109 @@ func newUsersHandler(w http.ResponseWriter, r *http.Request) {
   http.Redirect(w, r, "/users", 301)
 }
 
+// Websockets
+
+var upgrader = websocket.Upgrader{}
+var hub = Hub {
+  clients: make(map[*Client]bool),
+  broadcast: make(chan []byte),
+  addClient: make(chan *Client),
+  removeClient: make(chan *Client),
+}
+
+// The clients will run in a different proccess than the hub.
+// We communicate via channels.
+type Hub struct {
+  clients map[*Client]bool
+  broadcast chan []byte
+  addClient chan *Client
+  removeClient chan *Client
+}
+
+func (hub *Hub) start() {
+  for {
+    select {
+    case client := <-hub.addClient:
+      hub.clients[client] = true
+    case client := <-hub.removeClient:
+      if _, ok := hub.clients[client]; ok {
+        delete(hub.clients, client)
+        close(client.send)
+      }
+    case message := <-hub.broadcast:
+      for client := range hub.clients {
+        client.send <- message
+      }
+    }
+  }
+}
+
+type Client struct {
+  ws *websocket.Conn
+  send chan []byte // byte stream channel
+}
+
+func (c *Client) Write() {
+  // Always close connection whatever the path of execution
+  defer func() {
+    hub.removeClient <- c
+    c.ws.Close()
+  }()
+
+  for { // Infinite loop
+    select { // select is blocking
+    case msg, ok := <-c.send:
+      if !ok {
+        c.ws.WriteMessage(websocket.CloseMessage, []byte{})
+        return
+      }
+      c.ws.WriteMessage(websocket.TextMessage, msg)
+    }
+  }
+}
+
+func (c *Client) Read() {
+  // Always close connection whatever the path of execution
+  defer func() {
+    hub.removeClient <- c
+    c.ws.Close()
+  }()
+
+  for {
+    _, msg, err := c.ws.ReadMessage()
+    if err != nil {
+      return
+    }
+
+    // Broadcast message
+    hub.broadcast <- msg
+  }
+}
+
+
+func wsHandler(w http.ResponseWriter, r *http.Request) {
+  conn, err := upgrader.Upgrade(w, r, nil)
+
+  if err != nil { // Be explicit when testing nil (or != nil)
+    http.NotFound(w, r)
+  }
+
+  client := &Client { // We'll use this by reference, hence this
+    ws: conn,
+    send: make(chan []byte), // This defines and creates a byte stream channel
+  }
+
+  hub.addClient <- client
+
+  go client.Write()
+  go client.Read()
+}
+
+// Main
+
 func main() {
+  go hub.start()
+
   r := mux.NewRouter()
   r.HandleFunc("/", handler)
   r.HandleFunc("/users", getUsersHandler).Methods("GET")
