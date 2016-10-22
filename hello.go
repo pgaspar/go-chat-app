@@ -29,6 +29,14 @@ import "github.com/gorilla/mux"
 
 var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
 
+type User struct {
+  Username string
+}
+
+// array with User structs, initialized with a single User
+// with "admin" as username
+var users = []User { User{"admin"} }
+
 func handler(w http.ResponseWriter, r *http.Request) {
   type Header struct {
     Title string
