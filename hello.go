@@ -74,6 +74,8 @@ func newUsersHandler(w http.ResponseWriter, r *http.Request) {
   users = append(users, User {
     Username: username,
   })
+
+  http.Redirect(w, r, "/users", 301)
 }
 
 func main() {
