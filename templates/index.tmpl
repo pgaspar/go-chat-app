@@ -17,6 +17,22 @@
   <script>
     var socket = new WebSocket("ws://localhost:8080/ws");
 
+    var btn = document.getElementById("message-btn");
+    var input = document.getElementById("message-input");
+
+    var clickHandler = function(event) {
+      var input = document.getElementById("message-input");
+      socket.send(input.value);
+      input.value = "";
+    }
+
+    btn.onclick = clickHandler;
+    input.addEventListener("keypress", function(e) {
+      if (e.which == 13 || e.keyCode == 13) {
+        clickHandler(e);
+      }
+    })
+
     socket.onopen = function(event) {
       socket.send("Client joined");
     }
