@@ -18,17 +18,21 @@ import "html/template"
 var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
 
 func handler(w http.ResponseWriter, r *http.Request) {
+  type Header struct {
+    Title string
+  }
   type Index struct {
     // If it starts with capital letter it's public.
     // If it doesn't, it's private, so you can't use it in the templates.
     Name string // default: ""
-    Title string
+    Header Header
   }
 
-  // data := Index { "pedro", "yooooo" }
   data := Index {
     Name: "pedro",
-    Title: "yooooo gooooo!",
+    Header: Header {
+      Title: "yoooo goooo!",
+    },
   }
 
   templates.ExecuteTemplate(w, "index", &data)
