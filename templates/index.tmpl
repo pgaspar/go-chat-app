@@ -2,17 +2,18 @@
 
   {{ template "header" .Header }}
 
-  <center>
-    Hello {{ .Name }}!
-    <br><br>
+  Hello {{ .Name }}!
+  <br><br>
 
-    <div id="chat">
-      <b>Chat</b><br>
-    </div>
+  <hr>
+  <div id="chat">
+    <h2>Chat</h2>
+  </div>
 
-    <input type="text" id="message-input" autofocus />
-    <button id="message-btn">Send</button>
-  </center>
+  <hr><br>
+
+  <input type="text" id="message-input" autofocus />
+  <button id="message-btn">Send</button>
 
   <script>
     var socket = new WebSocket("ws://localhost:8080/ws");
@@ -37,7 +38,7 @@
       socket.send("Client joined");
     }
 
-    socket.onbeforereload = function(event) {
+    socket.onbeforeunload = function(event) {
       socket.close();
     }
 
