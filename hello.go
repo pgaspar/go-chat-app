@@ -10,9 +10,10 @@ package main
 import "net/http"
 import "html/template"
 
+var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
+
 func handler(w http.ResponseWriter, r *http.Request) {
-  t, _ := template.ParseFiles("templates/index.tmpl")
-  t.Execute(w, nil)
+  templates.ExecuteTemplate(w, "index", nil)
 }
 
 func main() {
