@@ -22,13 +22,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
     // If it starts with capital letter it's public.
     // If it doesn't, it's private, so you can't use it in the templates.
     Name string // default: ""
-    name string // default: ""
+    Title string
   }
 
   // data := Index { "pedro", "yooooo" }
   data := Index {
     Name: "pedro",
-    name: "yooooo",
+    Title: "yooooo gooooo!",
   }
 
   templates.ExecuteTemplate(w, "index", &data)
