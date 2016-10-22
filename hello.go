@@ -31,7 +31,7 @@ import "encoding/json"
 var templates = template.Must(template.ParseGlob("templates/*.tmpl"))
 
 type User struct {
-  Username string
+  Username string `json:"user"` // Define the JSON key (instead of Username)
 }
 
 // array with User structs, initialized with a single User
