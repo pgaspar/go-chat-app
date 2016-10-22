@@ -1,6 +1,6 @@
 # Example Chat App :rocket:
 
-Example chat app using websockets. Code and notes from a Go workshop by @adbjesus.
+Example chat app using websockets. Code and notes from a Go workshop by [@adbjesus](http://github.com/adbjesus).
 
 ## Topics covered
 
