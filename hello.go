@@ -117,5 +117,7 @@ func main() {
   r.HandleFunc("/", handler)
   r.HandleFunc("/users", getUsersHandler).Methods("GET")
   r.HandleFunc("/users/new/{username:[a-zA-Z]+}", newUsersHandler).Methods("GET")
+  r.HandleFunc("/ws", wsHandler)
+
   http.ListenAndServe(":8080", r)
 }
